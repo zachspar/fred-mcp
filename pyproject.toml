@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-mcp"
-version = "0.0.1-alpha"
+version = "0.1.0-beta"
 authors = [
     { name="Zachary Spar", email="zachspar@gmail.com" },
 ]
@@ -29,10 +29,17 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "fastmcp~=2.3.4",
+    "fred-py-api~=1.2.0",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/zachspar/fred-mcp"
 "Bug Tracker" = "https://github.com/zachspar/fred-mcp/issues"
+
+[project.scripts]
+fred-mcp = "fred_mcp.main:main"
 
 [tool.coverage.run]
 branch = true
