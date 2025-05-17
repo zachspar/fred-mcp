@@ -8,5 +8,10 @@ WORKDIR /app
 ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip install -U pip && pip install .
 
-EXPOSE 8000
+ENV MCP_HOST=0.0.0.0
+ENV MCP_PORT=8000
+ENV MCP_TRANSPORT=sse
+
+EXPOSE ${MCP_PORT}
+
 CMD ["fred-mcp"]
