@@ -58,10 +58,10 @@ def main():
     """
     Main function to run the MCP server.
     """
-    _TRANSPORT = os.environ.get("MCP_TRANSPORT", "sse")
-    _PORT = os.environ.get("MCP_SERVER_PORT", "8000")
+    _TRANSPORT = os.environ.get("MCP_SERVER_TRANSPORT", "sse")
+    _PORT = os.environ.get("MCP_SERVER_PORT", 8000)
     _HOST = os.environ.get("MCP_SERVER_HOST", "localhost")
-    mcp.run(transport=_TRANSPORT, port=_PORT, host=_HOST)
+    mcp.run(transport=_TRANSPORT, port=int(_PORT), host=_HOST)
 
 
 if __name__ == "__main__":
