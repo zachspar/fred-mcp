@@ -14,7 +14,7 @@ jobs:
       contents: read
     environment:
       name: ghcr
-      url: ghcr.io/zachspar/fred-mcp/fred-mcp-server
+      url: https://ghcr.io/zachspar/fred-mcp/fred-mcp-server
     steps:
       - uses: actions/checkout@v4
 
