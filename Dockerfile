@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.13-alpine
 
 COPY src/fred_mcp /app/fred_mcp
 COPY pyproject.toml /app
