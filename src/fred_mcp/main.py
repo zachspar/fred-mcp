@@ -11,7 +11,7 @@ fred = FredAPI(os.environ.get("FRED_API_KEY"))
 
 
 @mcp.tool(
-    name="FRED Series Observations",
+    name="FREDSeriesObservations",
     description="Get FRED series observations.",
 )
 def get_fred_series_observations(
@@ -58,10 +58,15 @@ def main():
     """
     Main function to run the MCP server.
     """
-    _TRANSPORT = os.environ.get("MCP_SERVER_TRANSPORT", "sse")
+    _TRANSPORT = os.environ.get("MCP_SERVER_TRANSPORT", "stdio")
     _PORT = os.environ.get("MCP_SERVER_PORT", 8000)
     _HOST = os.environ.get("MCP_SERVER_HOST", "localhost")
-    mcp.run(transport=_TRANSPORT, port=int(_PORT), host=_HOST)
+
+    if _TRANSPORT == "stdio":
+        mcp.run(transport=_TRANSPORT)
+    else:
+        # if transport is not stdio, we need to set the host and port for server
+        mcp.run(transport=_TRANSPORT, port=int(_PORT), host=_HOST)
 
 
 if __name__ == "__main__":
