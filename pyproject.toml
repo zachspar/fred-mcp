@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-mcp"
-version = "0.1.1-alpha"
+version = "0.1.2-alpha"
 authors = [
     { name="Zachary Spar", email="zachspar@gmail.com" },
 ]
-description = " FRED Python MCP server with fred-py-api."
+description = "FRED Python MCP server with fred-py-api."
 readme = "README.md"
 requires-python = ">=3.6"
 classifiers = [
