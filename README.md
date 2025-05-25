@@ -19,23 +19,6 @@ Easily use this MCP Server in a desktop client of your choosing.
 
 ### Recommended
 
-> [!TIP]
-> You can also use the `docker` image to run this MCP server in any of the integrations.
->
-> ```json
-> {
->   "command": "docker",
->   "args": [
->     "run",
->     "-i",
->     "--rm",
->     "-e", "MCP_SERVER_TRANSPORT=stdio",
->     "-e", "FRED_API_KEY=your_api_key",
->     "ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest"
->   ]
-> }
-> ```
-
 #### [5ire](https://5ire.app/)
 ```json
 {
@@ -90,6 +73,23 @@ fred-mcp
 ```
 
 ### Docker
+
+> [!TIP]
+> You can also use the `docker` image to run this MCP server in any of the integrations.
+>
+> ```json
+> {
+>   "command": "docker",
+>   "args": [
+>     "run",
+>     "-i",
+>     "--rm",
+>     "-e", "MCP_SERVER_TRANSPORT=stdio",
+>     "-e", "FRED_API_KEY=your_api_key",
+>     "ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest"
+>   ]
+> }
+> ```
 
 ```bash
 docker run -d -p 8000:8000 -e FRED_API_KEY=your_api_key --name fred-mcp-server ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest
