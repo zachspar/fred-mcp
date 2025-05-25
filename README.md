@@ -19,6 +19,20 @@ Easily use this MCP Server in a desktop client of your choosing.
 
 ### Recommended
 
+#### [Claude Desktop](https://claude.ai/download)
+```json
+{
+  "mcpServers": {
+    "FRED MCP Server": {
+      "command": "/path/to/fred-mcp",
+      "env": {
+        "FRED_API_KEY": "<your api key>"
+      }
+    }
+  }
+}
+```
+
 #### [5ire](https://5ire.app/)
 ```json
 {
@@ -31,20 +45,6 @@ Easily use this MCP Server in a desktop client of your choosing.
   "isActive": true,
   "key": "FredMcpServer",
   "type": "local"
-}
-```
-
-#### [Claude Desktop](https://claude.ai/download)
-```json
-{
-  "mcpServers": {
-    "FRED MCP Server": {
-      "command": "/path/to/fred-mcp",
-      "env": {
-        "FRED_API_KEY": "<your api key>"
-      }
-    }
-  }
 }
 ```
 
