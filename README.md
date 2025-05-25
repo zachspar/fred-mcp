@@ -75,7 +75,7 @@ fred-mcp
 ### Docker
 
 > [!TIP]
-> You can also use the `docker` image to run this MCP server in any of the integrations.
+> You can also use the `docker` image to run this MCP server with any of the integration clients.
 >
 > ```json
 > {
