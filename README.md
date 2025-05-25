@@ -19,10 +19,25 @@ Easily use this MCP Server in a desktop client of your choosing.
 
 ### Recommended
 
+> [!TIP]
+> You can also use the `docker` image to run this MCP server in any of the integrations.
+>
+> ```json
+> {
+>   "command": "docker",
+>   "args": [
+>     "run",
+>     "-d",
+>     "-p",
+>     "8000:8000",
+>     "-e", "FRED_API_KEY=your_api_key",
+>     "--name", "fred-mcp-server",
+>     "ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest"
+>   ]
+> }
+> ```
+
 #### [5ire](https://5ire.app/)
-
-See below for an example configuration.
-
 ```json
 {
   "name": "FRED MCP Server",
@@ -38,13 +53,24 @@ See below for an example configuration.
 ```
 
 #### [Claude Desktop](https://claude.ai/download)
-
-See below for an example configuration.
-
 ```json
 {
   "mcpServers": {
     "FRED MCP Server": {
+      "command": "/path/to/fred-mcp",
+      "env": {
+        "FRED_API_KEY": "<your api key>"
+      }
+    }
+  }
+}
+```
+
+#### [`mcphost`](https://github.com/mark3labs/mcphost)
+```json
+{
+  "mcpServers": {
+    "fred": {
       "command": "/path/to/fred-mcp",
       "env": {
         "FRED_API_KEY": "<your api key>"
