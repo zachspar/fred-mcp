@@ -19,10 +19,21 @@ Easily use this MCP Server in a desktop client of your choosing.
 
 ### Recommended
 
+#### [Claude Desktop](https://claude.ai/download)
+```json
+{
+  "mcpServers": {
+    "FRED MCP Server": {
+      "command": "/path/to/fred-mcp",
+      "env": {
+        "FRED_API_KEY": "<your api key>"
+      }
+    }
+  }
+}
+```
+
 #### [5ire](https://5ire.app/)
-
-See below for an example configuration.
-
 ```json
 {
   "name": "FRED MCP Server",
@@ -37,14 +48,11 @@ See below for an example configuration.
 }
 ```
 
-#### [Claude Desktop](https://claude.ai/download)
-
-See below for an example configuration.
-
+#### [`mcphost`](https://github.com/mark3labs/mcphost)
 ```json
 {
   "mcpServers": {
-    "FRED MCP Server": {
+    "fred": {
       "command": "/path/to/fred-mcp",
       "env": {
         "FRED_API_KEY": "<your api key>"
@@ -65,6 +73,23 @@ fred-mcp
 ```
 
 ### Docker
+
+> [!TIP]
+> You can also use the `docker` image to run this MCP server with any of the integration clients.
+>
+> ```json
+> {
+>   "command": "docker",
+>   "args": [
+>     "run",
+>     "-i",
+>     "--rm",
+>     "-e", "MCP_SERVER_TRANSPORT=stdio",
+>     "-e", "FRED_API_KEY=your_api_key",
+>     "ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest"
+>   ]
+> }
+> ```
 
 ```bash
 docker run -d -p 8000:8000 -e FRED_API_KEY=your_api_key --name fred-mcp-server ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest
