@@ -27,11 +27,10 @@ Easily use this MCP Server in a desktop client of your choosing.
 >   "command": "docker",
 >   "args": [
 >     "run",
->     "-d",
->     "-p",
->     "8000:8000",
+>     "-i",
+>     "--rm",
+>     "-e", "MCP_SERVER_TRANSPORT=stdio",
 >     "-e", "FRED_API_KEY=your_api_key",
->     "--name", "fred-mcp-server",
 >     "ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest"
 >   ]
 > }
