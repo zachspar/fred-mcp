@@ -23,44 +23,104 @@ Requires Python 3.10+.
 
 Get a free FRED API key at [fredaccount.stlouisfed.org/apikey](https://fredaccount.stlouisfed.org/apikey).
 
-## Quick start
+## Setup
 
-### Local (stdio)
+### Remote hosted server (recommended)
 
-Best for Claude Desktop, mcphost, and other clients that spawn a local process.
+Use the public hosted server with **bring your own key** (BYOK): no install and no shared server-side API key. Each client sends its own FRED API key in the `X-FRED-API-Key` header.
 
-```bash
-export FRED_API_KEY=your_api_key
-fred-mcp
+Transport: **streamable HTTP**. Endpoint: `https://fred-mcp-prod.fly.dev/mcp`.
+
+Add this to your MCP client's configuration file and restart the client:
+
+```json
+{
+  "mcpServers": {
+    "fred-mcp": {
+      "url": "https://fred-mcp-prod.fly.dev/mcp",
+      "headers": {
+        "X-FRED-API-Key": "<your fred api key>"
+      }
+    }
+  }
+}
 ```
 
-### Remote HTTP (bring your own key)
-
-Deploy the server publicly and let each client send their own FRED API key via header. **No shared server-side key is required.**
-
-Clients connect with `streamable-http` and send:
-
-```http
-X-FRED-API-Key: your_fred_api_key
-```
-
-Example with the FastMCP client:
+Programmatic example with the FastMCP client:
 
 ```python
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
 transport = StreamableHttpTransport(
-    "https://your-host.example.com/mcp",
+    "https://fred-mcp-prod.fly.dev/mcp",
     headers={"X-FRED-API-Key": "your_fred_api_key"},
 )
 async with Client(transport=transport) as client:
-  await client.ping()
+    await client.ping()
 ```
+
+### Local (stdio)
+
+For clients that spawn a local process, install [fred-mcp](#installation) and use:
+
+```json
+{
+  "mcpServers": {
+    "fred-mcp": {
+      "command": "fred-mcp",
+      "env": {
+        "FRED_API_KEY": "<your fred api key>"
+      }
+    }
+  }
+}
+```
+
+Or run directly from the terminal:
+
+```bash
+export FRED_API_KEY=your_api_key
+fred-mcp
+```
+
+### Self-hosted HTTP
+
+Deploy your own instance and use the same `url` + `headers` configuration, substituting your host for the endpoint above. **No shared server-side key is required** when clients send `X-FRED-API-Key`.
 
 For public internet deployment, terminate TLS at a reverse proxy (nginx, Caddy, Cloudflare). Do not expose plain HTTP with API keys.
 
-### Optional server-side fallback key
+#### Docker
+
+Run the server:
+
+```bash
+docker run -d -p 8000:8000 \
+  --name fred-mcp-server \
+  ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest
+```
+
+Connect with your FRED API key in the `X-FRED-API-Key` header (same JSON shape as the remote hosted example, with `url` set to your deployment).
+
+For stdio via Docker:
+
+```json
+{
+  "mcpServers": {
+    "fred-mcp": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "MCP_SERVER_TRANSPORT=stdio",
+        "-e", "FRED_API_KEY=<your fred api key>",
+        "ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+#### Optional server-side fallback key
 
 Set `FRED_API_KEY` on the server for clients that cannot send custom headers. Header takes precedence when both are present.
 
@@ -71,64 +131,6 @@ Set `FRED_API_KEY` on the server for clients that cannot send custom headers. He
 | `MCP_SERVER_TRANSPORT` | `stdio` | `stdio`, `streamable-http`, or `sse` |
 | `MCP_SERVER_HOST` | `localhost` | Bind host for HTTP transports |
 | `MCP_SERVER_PORT` | `8000` | Bind port for HTTP transports |
-
-## Client integration
-
-### Claude Desktop
-
-```json
-{
-  "mcpServers": {
-    "fred-mcp": {
-      "command": "fred-mcp",
-      "env": {
-        "FRED_API_KEY": "<your api key>"
-      }
-    }
-  }
-}
-```
-
-### mcphost
-
-```json
-{
-  "mcpServers": {
-    "fred": {
-      "command": "fred-mcp",
-      "env": {
-        "FRED_API_KEY": "<your api key>"
-      }
-    }
-  }
-}
-```
-
-### Docker (streamable-http)
-
-Run the server:
-
-```bash
-docker run -d -p 8000:8000 \
-  --name fred-mcp-server \
-  ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest
-```
-
-Connect with your FRED key in the header (see remote HTTP example above).
-
-For stdio via Docker:
-
-```json
-{
-  "command": "docker",
-  "args": [
-    "run", "-i", "--rm",
-    "-e", "MCP_SERVER_TRANSPORT=stdio",
-    "-e", "FRED_API_KEY=your_api_key",
-    "ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest"
-  ]
-}
-```
 
 ## Tools (31)
 
