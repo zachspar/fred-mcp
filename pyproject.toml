@@ -1,18 +1,18 @@
 [build-system]
-requires = ["setuptools>=61.0",]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-mcp"
-version = "0.2.0-beta"
+version = "1.0.0"
 authors = [
-    { name="Zachary Spar", email="zachspar@gmail.com" },
+    { name = "Zachary Spar", email = "zachspar@gmail.com" },
 ]
 description = "A fully-featured FRED MCP server."
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Financial and Insurance Industry",
     "Intended Audience :: Science/Research",
@@ -21,14 +21,21 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3.15",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "fastmcp~=2.3.4",
-    "fred-py-api~=1.2.0",
+    "fastmcp>=3.3,<4",
+    "fred-py-api~=1.2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
 ]
 
 [project.urls]
@@ -37,6 +44,13 @@ dependencies = [
 
 [project.scripts]
 fred-mcp = "fred_mcp.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
 
 [tool.coverage.run]
 branch = true
@@ -53,3 +67,6 @@ directory = "coverage_html_report"
 [tool.black]
 line-length = 79
 
+[tool.ruff]
+line-length = 79
+target-version = "py310"

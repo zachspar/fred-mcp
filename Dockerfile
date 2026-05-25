@@ -1,7 +1,7 @@
 FROM python:3.13-alpine
 
-COPY src/fred_mcp /app/fred_mcp
-COPY pyproject.toml /app
+COPY pyproject.toml /app/
+COPY src/ /app/src/
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN pip install -U pip && pip install .
 
 ENV MCP_SERVER_HOST="0.0.0.0"
 ENV MCP_SERVER_PORT="8000"
-ENV MCP_SERVER_TRANSPORT="sse"
+ENV MCP_SERVER_TRANSPORT="streamable-http"
 
 EXPOSE ${MCP_SERVER_PORT}
 

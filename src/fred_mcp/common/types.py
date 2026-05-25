@@ -1,16 +1,19 @@
 from typing import Literal, TypeAlias
 
 __all__ = [
-    "FredUnit",
-    "FredSortOrder",
-    "FredFrequency",
     "FredAggregationMethod",
+    "FredFilterVariable",
+    "FredFrequency",
     "FredOutput",
+    "FredReleaseOrderBy",
     "FredSearch",
     "FredSeriesSearchOrderBy",
+    "FredSeriesUpdateFilter",
+    "FredSortOrder",
+    "FredSourceOrderBy",
     "FredTagGroup",
     "FredTagOrderBy",
-    "FredSeriesUpdateFilter",
+    "FredUnit",
 ]
 
 FredSortOrder: TypeAlias = Literal["asc", "desc"]
@@ -54,6 +57,19 @@ FredSeriesSearchOrderBy: TypeAlias = Literal[
     "popularity",
     "group_popularity",
 ]
+FredReleaseOrderBy: TypeAlias = Literal[
+    "release_id",
+    "name",
+    "press_release",
+    "realtime_start",
+    "realtime_end",
+]
+FredSourceOrderBy: TypeAlias = Literal[
+    "source_id",
+    "name",
+    "realtime_start",
+    "realtime_end",
+]
 FredTagGroup: TypeAlias = Literal[
     "freq",
     "gen",
@@ -74,4 +90,9 @@ FredSeriesUpdateFilter: TypeAlias = Literal[
     "all",
     "macro",
     "regional",
+]
+FredFilterVariable: TypeAlias = Literal[
+    "frequency",
+    "units",
+    "seasonal_adjustment",
 ]
