@@ -1,42 +1,51 @@
-import os
-import asyncio
-from typing import Literal
+from fred_mcp.categories.tools import categories_mcp
+from fred_mcp.config import get_settings
+from fred_mcp.releases.tools import releases_mcp
+from fred_mcp.series.tools import series_mcp
+from fred_mcp.sources.tools import sources_mcp
+from fred_mcp.tags.tools import tags_mcp
 
 from fastmcp import FastMCP
 
-from fred_mcp.series.mcp import series_mcp
+mcp = FastMCP("fred-mcp")
+
+mcp.mount(series_mcp)
+mcp.mount(categories_mcp)
+mcp.mount(releases_mcp)
+mcp.mount(sources_mcp)
+mcp.mount(tags_mcp)
 
 
-mcp = FastMCP("FRED MCP Server")
-
-
-async def import_servers():
-    """
-    Import mcp sub-servers.
-    """
-    await mcp.import_server("series", series_mcp)
-
-
-def main():
-    """
-    Main function to run the MCP server.
-    """
-    asyncio.run(import_servers())
-
-    _TRANSPORT: Literal["stdio", "sse", "streamable-http"] = os.environ.get(
-        "MCP_SERVER_TRANSPORT", "stdio"
+@mcp.prompt(
+    name="fred_research_workflow",
+    description=(
+        "Guide for researching economic data with FRED: search series, "
+        "inspect metadata, then fetch observations."
+    ),
+)
+def fred_research_workflow(topic: str) -> str:
+    return (
+        f"Research economic data about '{topic}' using FRED:\n"
+        "1. search_series(search_text=...) to find candidate series IDs.\n"
+        "2. get_series(series_id=...) for metadata, units, and frequency.\n"
+        "3. get_series_observations(series_id=...) for the actual data.\n"
+        "4. Optionally use get_series_release or get_category_series to "
+        "explore related releases and categories."
     )
-    _PORT = os.environ.get("MCP_SERVER_PORT", "8000")
-    _HOST = os.environ.get("MCP_SERVER_HOST", "localhost")
 
-    if _TRANSPORT == "stdio":
-        mcp.run(transport=_TRANSPORT)
+
+def main() -> None:
+    settings = get_settings()
+    settings.validate_for_transport()
+
+    if settings.transport == "stdio":
+        mcp.run(transport=settings.transport)
     else:
-        if not _PORT.isnumeric():
-            raise ValueError(f"Invalid port number: {_PORT}")
-
-        # if transport is not stdio, we need to set the host and port for server
-        mcp.run(transport=_TRANSPORT, port=int(_PORT), host=_HOST)
+        mcp.run(
+            transport=settings.transport,
+            host=settings.host,
+            port=settings.port,
+        )
 
 
 if __name__ == "__main__":
