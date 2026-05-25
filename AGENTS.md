@@ -4,45 +4,62 @@
 
 ### Overview
 
-This is a Python MCP (Model Context Protocol) server for accessing Federal Reserve Economic Data (FRED). It exposes 10 tools via `fastmcp` that wrap the `fred-py-api` library. Single-service project with no databases or external infrastructure beyond the FRED API.
+A Python MCP server (v1.0.0) for FRED economic data built on FastMCP 3.x. Exposes **31 tools** across five domains (series, categories, releases, sources, tags) via `fastmcp` wrapping `fred-py-api`. Single-service project with no databases or external infrastructure beyond the FRED API.
 
 ### Required secrets
 
-- `FRED_API_KEY` — 32-character API key from <https://fred.stlouisfed.org/docs/api/api_key.html>. Must be set before running the server; the `fred-py-api` client validates key length at import time.
+- `FRED_API_KEY` — 32-character API key from <https://fredaccount.stlouisfed.org/apikey>. Required for stdio transport; optional for HTTP transports (clients can send via `X-FRED-API-Key` header instead).
 
 ### Running the server
 
 ```bash
-# SSE mode (preferred for testing)
-FRED_API_KEY=$FRED_API_KEY MCP_SERVER_TRANSPORT=sse MCP_SERVER_PORT=8000 MCP_SERVER_HOST=0.0.0.0 fred-mcp
+# streamable-http mode (preferred for testing, default in Docker)
+FRED_API_KEY=$FRED_API_KEY MCP_SERVER_TRANSPORT=streamable-http MCP_SERVER_PORT=8000 MCP_SERVER_HOST=0.0.0.0 fred-mcp
 
 # stdio mode (default, for MCP client integration)
 FRED_API_KEY=$FRED_API_KEY fred-mcp
 ```
 
-### Linting
+The streamable-http endpoint is at `http://localhost:8000/mcp`.
+
+### Linting and testing
+
+Per the README `Development` section:
 
 ```bash
-black --check --target-version py312 src/
+ruff check src tests
+pytest
 ```
-
-The repo has pre-existing formatting deviations (extra blank lines) that `black` flags. This is a known upstream style choice.
 
 ### Dependency compatibility
 
-The project depends on `fastmcp~=2.3.4`. At the time of writing, `pydantic>=2.12` causes a `TypeError: cannot specify both default and default_factory` crash at import time due to a pydantic/fastmcp incompatibility. Pin `pydantic>=2.11,<2.12` if this surfaces. The update script handles this automatically.
+When installing, `fastmcp-slim` (a dependency of `fastmcp`) must install its source `.py` files alongside `.pyc` files. If `from fastmcp.exceptions import ToolError` fails with `ModuleNotFoundError`, run:
 
-### Testing
+```bash
+pip install --force-reinstall fastmcp-slim fastmcp
+```
 
-No automated test suite exists in the repository. To verify the server works, start it in SSE mode and interact via the MCP JSON-RPC protocol over `/sse` and the session-specific `/messages/` endpoint.
+This resolves a packaging race condition where `.py` source files are missing from the `fastmcp/` namespace directory.
 
 ### Project layout
 
 ```
 src/fred_mcp/
-  main.py              — Entry point, FastMCP server setup, transport config
-  series/mcp.py        — 10 FRED series tools (search, observations, tags, etc.)
+  main.py              — Entry point, mounts sub-servers, transport config
+  config.py            — Settings dataclass, env var parsing
+  credentials.py       — API key resolution (env var or HTTP header)
+  series/tools.py      — 10 series tools
+  categories/tools.py  — 6 category tools
+  releases/tools.py    — 9 release tools
+  sources/tools.py     — 3 source tools
+  tags/tools.py        — 3 tag tools
+  common/tools.py      — Shared call_fred helper
+  common/errors.py     — ToolError wrapper
   common/types.py      — TypeAlias definitions for FRED API parameters
-pyproject.toml         — Build config, dependencies, black config (line-length=79)
+tests/
+  test_tools.py        — Series tool tests + 31-tool count assertion
+  test_credentials.py  — API key resolution and settings tests
+  test_modules.py      — Parametrized module delegation tests
+pyproject.toml         — Build config, dependencies, ruff/pytest config
 Dockerfile             — Alpine-based container image
 ```
