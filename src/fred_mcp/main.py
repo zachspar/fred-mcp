@@ -1,11 +1,14 @@
+import structlog
+from fastmcp import FastMCP
+
 from fred_mcp.categories.tools import categories_mcp
 from fred_mcp.config import get_settings
+from fred_mcp.logging import configure_logging
+from fred_mcp.middleware import ToolCallLoggingMiddleware
 from fred_mcp.releases.tools import releases_mcp
 from fred_mcp.series.tools import series_mcp
 from fred_mcp.sources.tools import sources_mcp
 from fred_mcp.tags.tools import tags_mcp
-
-from fastmcp import FastMCP
 
 mcp = FastMCP("fred-mcp")
 
@@ -14,6 +17,7 @@ mcp.mount(categories_mcp)
 mcp.mount(releases_mcp)
 mcp.mount(sources_mcp)
 mcp.mount(tags_mcp)
+mcp.add_middleware(ToolCallLoggingMiddleware())
 
 
 @mcp.prompt(
@@ -35,8 +39,15 @@ def fred_research_workflow(topic: str) -> str:
 
 
 def main() -> None:
+    configure_logging()
     settings = get_settings()
     settings.validate_for_transport()
+    structlog.get_logger("fred_mcp").info(
+        "server_start",
+        transport=settings.transport,
+        host=settings.host,
+        port=settings.port,
+    )
 
     if settings.transport == "stdio":
         mcp.run(transport=settings.transport)
