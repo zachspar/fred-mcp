@@ -13,7 +13,7 @@ pip install -e ".[dev]"
 make check
 ```
 
-`make check` runs `ruff check src tests` and then `pytest`. `make lint` and `make test` run one of those. CI calls `make check` on pull requests and pushes to `main` when `src/`, `tests/`, `pyproject.toml`, the `Makefile`, the Dockerfile, or the workflow file changes. A published GitHub Release publishes the Docker image to GHCR as `latest`, the release git tag, and the released commit SHA. Pushes to `main` do not push an image. The image runs `fred-mcp` with `MCP_SERVER_TRANSPORT=streamable-http` on `0.0.0.0:8000`.
+`make check` runs `ruff check src tests` and then `pytest`. `make lint` and `make test` run one of those. CI calls `make check` on pull requests and pushes to `main` when `src/`, `tests/`, `pyproject.toml`, the `Makefile`, the Dockerfile, or the workflow file changes. A published GitHub Release publishes the package to PyPI and the Docker image to GHCR as `latest`, the release git tag, and the released commit SHA. Pushes to `main` do neither. The image runs `fred-mcp` with `MCP_SERVER_TRANSPORT=streamable-http` on `0.0.0.0:8000`.
 
 Run the server:
 
