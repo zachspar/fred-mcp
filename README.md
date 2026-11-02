@@ -100,6 +100,8 @@ docker run -d -p 8000:8000 \
   ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest
 ```
 
+The image is published only when a GitHub Release is published. That push tags `latest`, the release's git tag, and the released commit SHA.
+
 Connect with your FRED API key in the `X-FRED-API-Key` header (same JSON shape as the remote hosted example, with `url` set to your deployment).
 
 For stdio via Docker:
