@@ -10,7 +10,12 @@ from fred import BaseFredAPIError
 from starlette.requests import Request
 from structlog.testing import capture_logs
 
-from fred_mcp.logging import configure_logging, payload_fields, redact
+from fred_mcp.logging import (
+    configure_logging,
+    payload_fields,
+    redact,
+    scrub_secrets,
+)
 from fred_mcp.main import mcp
 from fred_mcp.middleware import ToolCallLoggingMiddleware, request_fields
 from fred_mcp.series.tools import get_series
@@ -55,7 +60,7 @@ def test_redact_hides_api_key_fields() -> None:
         {
             "series_id": "GNPCA",
             "api_key": "abc",
-            "nested": [{"X-FRED-API-Key": "xyz"}],
+            "nested": ({"X-FRED-API-Key": "xyz"},),
         }
     )
     assert cleaned == {
@@ -63,6 +68,18 @@ def test_redact_hides_api_key_fields() -> None:
         "api_key": "[redacted]",
         "nested": [{"X-FRED-API-Key": "[redacted]"}],
     }
+
+
+def test_scrub_secrets_removes_query_param() -> None:
+    key = "a" * 32
+    text = (
+        "Error invoking Fred API: Max retries exceeded with url: "
+        f"/fred/series?api_key={key}&file_type=json"
+    )
+    cleaned = scrub_secrets(text)
+    assert key not in cleaned
+    assert "api_key=[redacted]" in cleaned
+    assert "file_type=json" in cleaned
 
 
 def test_payload_fields_truncate(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -148,7 +165,11 @@ async def test_tool_call_logs_arguments_result_and_request(
 async def test_tool_call_logs_error_with_arguments(
     mock_fred_api: MagicMock,
 ) -> None:
-    mock_fred_api.get_series.side_effect = BaseFredAPIError("bad request")
+    key = "b" * 32
+    mock_fred_api.get_series.side_effect = BaseFredAPIError(
+        "Error invoking Fred API: Max retries exceeded with url: "
+        f"/fred/series?api_key={key}&file_type=json"
+    )
     with (
         capture_logs() as logs,
         pytest.raises(ToolError, match="FRED API error"),
@@ -162,16 +183,26 @@ async def test_tool_call_logs_error_with_arguments(
     assert event["tool"] == "get_series"
     assert event["arguments"] == {"series_id": "BAD"}
     assert event["error_type"] == "ToolError"
-    assert "bad request" in event["error"]
+    assert "Max retries" in event["error"]
+    assert key not in json.dumps(event)
+    assert "api_key=[redacted]" in event["error"]
     assert "result" not in event
 
 
 def test_configure_logging_writes_json_to_stderr(
     capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    configure_logging()
-    structlog.get_logger("fred_mcp").info("server_start", transport="stdio")
-    captured = capsys.readouterr()
+    monkeypatch.setenv("MCP_LOG_LEVEL", "INFO")
+    try:
+        configure_logging()
+        structlog.get_logger("fred_mcp").info(
+            "server_start",
+            transport="stdio",
+        )
+        captured = capsys.readouterr()
+    finally:
+        structlog.reset_defaults()
     assert captured.out == ""
     payload = json.loads(captured.err.strip())
     assert payload["event"] == "server_start"
