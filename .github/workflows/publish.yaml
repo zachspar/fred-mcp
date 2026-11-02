@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/publish.yaml'
       - 'Dockerfile'
+      - 'Makefile'
       - 'pyproject.toml'
       - 'src/**'
       - 'tests/**'
@@ -16,9 +17,12 @@ on:
     paths:
       - '.github/workflows/publish.yaml'
       - 'Dockerfile'
+      - 'Makefile'
       - 'pyproject.toml'
       - 'src/**'
       - 'tests/**'
+  release:
+    types: [published]
 
 jobs:
   test:
@@ -36,15 +40,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install ".[dev]"
 
-      - name: Ruff
-        run: ruff check src tests
-
-      - name: Pytest
-        run: pytest
+      - name: Check
+        run: make check
 
   publish-ghcr:
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -54,6 +55,12 @@ jobs:
       url: https://ghcr.io/zachspar/fred-mcp/fred-mcp-server
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Released commit
+        id: released
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -74,7 +81,8 @@ jobs:
           push: true
           tags: |
             ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest
-            ghcr.io/zachspar/fred-mcp/fred-mcp-server:${{ github.sha }}
+            ghcr.io/zachspar/fred-mcp/fred-mcp-server:${{ github.event.release.tag_name }}
+            ghcr.io/zachspar/fred-mcp/fred-mcp-server:${{ steps.released.outputs.sha }}
           platforms: linux/amd64,linux/arm64
 
   publish-pypi:

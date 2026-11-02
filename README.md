@@ -100,6 +100,8 @@ docker run -d -p 8000:8000 \
   ghcr.io/zachspar/fred-mcp/fred-mcp-server:latest
 ```
 
+The image is published only when a GitHub Release is published. That push tags `latest`, the release's git tag, and the released commit SHA.
+
 Connect with your FRED API key in the `X-FRED-API-Key` header (same JSON shape as the remote hosted example, with `url` set to your deployment).
 
 For stdio via Docker:
@@ -131,6 +133,10 @@ Set `FRED_API_KEY` on the server for clients that cannot send custom headers. He
 | `MCP_SERVER_TRANSPORT` | `stdio` | `stdio`, `streamable-http`, or `sse` |
 | `MCP_SERVER_HOST` | `localhost` | Bind host for HTTP transports |
 | `MCP_SERVER_PORT` | `8000` | Bind port for HTTP transports |
+| `MCP_LOG_LEVEL` | `INFO` | Level for structlog JSON lines |
+| `MCP_LOG_MAX_BODY` | `65536` | Max bytes of a tool's arguments or result kept in one log line. `0` keeps the full payload |
+
+Each MCP tool call writes one JSON line to stderr. The line includes the tool name, the arguments, the result or error, and the duration. On HTTP it also includes the method, path, and `mcp-session-id` when that header is present. The FRED API key is not logged. Stderr is used so stdio transport keeps its protocol frames on stdout.
 
 ## Tools (31)
 
@@ -190,35 +196,13 @@ Set `FRED_API_KEY` on the server for clients that cannot send custom headers. He
 | `get_related_tags` | Related tags |
 | `get_tags_series` | Series matching tags |
 
-## Migration from 0.x
-
-Version 1.0.0 renames tools to snake_case and upgrades to FastMCP 3.x.
-
-| Old name (0.x) | New name (1.0) |
-|----------------|----------------|
-| `FREDSeries` | `get_series` |
-| `FREDSeriesCategories` | `get_series_categories` |
-| `FREDSeriesObservations` | `get_series_observations` |
-| `FREDSeriesRelease` | `get_series_release` |
-| `FREDSeriesSearch` | `search_series` |
-| `FREDSeriesSearchTags` | `search_series_tags` |
-| `FREDSeriesSearchRelatedTags` | `search_series_related_tags` |
-| `FREDSeriesTags` | `get_series_tags` |
-| `FREDSeriesUpdates` | `get_series_updates` |
-| `FREDSeriesVintageDates` | `get_series_vintage_dates` |
-
-21 additional tools were added for categories, releases, sources, and tags.
-
-Error responses now use MCP `ToolError` (`isError: true`) instead of `{"error": ...}` payloads.
-
 ## Development
 
 ```bash
 python3.13 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest
-ruff check src tests
+make check
 ```
 
 ## License

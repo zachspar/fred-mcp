@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from fred import BaseFredAPIError
 from fastmcp.server.dependencies import get_http_headers
+from fred import BaseFredAPIError
 
 from fred_mcp.common.errors import raise_fred_tool_error
 from fred_mcp.config import get_settings

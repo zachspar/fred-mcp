@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-mcp"
-version = "1.0.1"
+version = "1.1.0"
 authors = [
     { name = "Zachary Spar", email = "zachspar@gmail.com" },
 ]
@@ -28,10 +28,12 @@ classifiers = [
 dependencies = [
     "fastmcp>=3.3,<4",
     "fred-py-api~=1.2.1",
+    "structlog>=24.4",
 ]
 
 [project.optional-dependencies]
 dev = [
+    "anyio>=4.15.1",
     "coverage",
     "pytest",
     "pytest-asyncio",
@@ -50,6 +52,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 
 [tool.coverage.run]

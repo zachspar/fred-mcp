@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from fred import BaseFredAPIError
 from fastmcp.exceptions import ToolError
+from fred import BaseFredAPIError
 
 
 def raise_fred_tool_error(error: BaseFredAPIError) -> None:
