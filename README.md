@@ -8,7 +8,7 @@ A production-grade [Model Context Protocol](https://modelcontextprotocol.io/) se
 ## Features
 
 - Full FRED API v1 coverage: series, categories, releases, sources, and tags
-- FastMCP 3.x with structured tool output and proper `ToolError` handling
+- FastMCP 4 with structured tool output and proper `ToolError` handling
 - Dual-mode credentials: environment variable (stdio) or per-client HTTP header (remote BYOK)
 - Transports: `stdio`, `streamable-http`, and `sse`
 - Docker image published to GHCR
@@ -57,7 +57,7 @@ transport = StreamableHttpTransport(
     headers={"X-FRED-API-Key": "your_fred_api_key"},
 )
 async with Client(transport=transport) as client:
-    await client.ping()
+    await client.list_tools()
 ```
 
 ### Local (stdio)
