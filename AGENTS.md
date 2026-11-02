@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Open-source MCP server for FRED economic data. FastMCP 3 wraps `fred-py-api`. One process, no database, no cache. Version is in `pyproject.toml`. Python `>=3.10`. CI runs on 3.13.
+Open-source MCP server for FRED economic data. FastMCP 4 wraps `fred-py-api`. One process, no database, no cache. Version is in `pyproject.toml`. Python `>=3.10`. CI runs on 3.13.
 
 The server exposes 31 read-only tools in five domains, plus the `fred_research_workflow` prompt. `tests/test_tools.py` asserts the tool count. Change that assertion when you add or remove a tool.
 
