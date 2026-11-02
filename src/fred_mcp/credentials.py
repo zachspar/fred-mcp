@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from fred import FredAPI
 from fastmcp.exceptions import ToolError
+from fred import FredAPI
 
 from fred_mcp.config import get_settings
 

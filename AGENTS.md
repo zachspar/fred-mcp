@@ -10,11 +10,10 @@ The server exposes 31 read-only tools in five domains, plus the `fred_research_w
 python3.13 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-ruff check src tests
-pytest
+make check
 ```
 
-CI runs those two commands on pull requests and pushes to `main` when `src/`, `tests/`, `pyproject.toml`, the Dockerfile, or the workflow file changes. A push to `main` that passes also publishes the Docker image to GHCR. The image runs `fred-mcp` with `MCP_SERVER_TRANSPORT=streamable-http` on `0.0.0.0:8000`.
+`make check` runs `ruff check src tests` and then `pytest`. `make lint` and `make test` run one of those. CI calls `make check` on pull requests and pushes to `main` when `src/`, `tests/`, `pyproject.toml`, the `Makefile`, the Dockerfile, or the workflow file changes. A push to `main` that passes also publishes the Docker image to GHCR. The image runs `fred-mcp` with `MCP_SERVER_TRANSPORT=streamable-http` on `0.0.0.0:8000`.
 
 Run the server:
 
@@ -47,7 +46,7 @@ Only wrap methods `fred-py-api` already exposes. Keep the tool name and the FRED
 
 `get_settings()` caches the first read of the environment. Tests that change env vars call `reset_settings()`.
 
-Never log the API key, the header that carries it, or any value under an `api_key` / `authorization` / `password` field. `redact()` in `logging.py` is the backstop for tool payloads. Do not log raw request headers.
+Never log the API key, the header that carries it, or any value under an `api_key` / `authorization` / `password` field. `redact()` scrubs those fields in tool payloads. `scrub_secrets()` blanks `name=value` secrets in error text, including a FRED `api_key` query parameter. Do not log raw request headers.
 
 ## Logging
 

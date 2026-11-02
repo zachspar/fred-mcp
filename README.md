@@ -200,8 +200,7 @@ Each MCP tool call writes one JSON line to stderr. The line includes the tool na
 python3.13 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-pytest
-ruff check src tests
+make check
 ```
 
 ## License

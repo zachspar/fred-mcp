@@ -9,7 +9,7 @@ from fastmcp.server.dependencies import get_http_request
 from fastmcp.server.middleware import CallNext, Middleware, MiddlewareContext
 from fastmcp.tools.base import ToolResult
 
-from fred_mcp.logging import payload_fields
+from fred_mcp.logging import payload_fields, scrub_secrets
 
 _REQUEST_HEADERS = (("mcp-session-id", "mcp_session_id"),)
 
@@ -48,6 +48,7 @@ def _arguments(message: Any) -> dict[str, Any]:
 
 
 def tool_output(result: Any) -> Any:
+    """Prefer structured content, then text blocks, otherwise ``repr``."""
     structured = getattr(result, "structured_content", None)
     if isinstance(structured, dict):
         return structured
@@ -88,7 +89,7 @@ class ToolCallLoggingMiddleware(Middleware):
                 "error",
                 tool=tool_name,
                 ok=False,
-                error=str(exc),
+                **payload_fields("error", scrub_secrets(str(exc))),
                 error_type=type(exc).__name__,
                 duration_ms=_duration_ms(started),
                 **payload_fields("arguments", arguments),
